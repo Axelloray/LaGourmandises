@@ -433,7 +433,7 @@
     <div class="form-row"><label>Prénom Nom</label><input type="text" id="eName"/></div>
     <div class="form-row"><label>Code PIN (4 chiffres)</label><input type="password" id="ePin" maxlength="4"/></div>
     <div class="form-row"><label>Site</label>
-      <select id="eSite"><option value="Saint Ouen des Toits">Saint Ouen des Toits</option><option value="Chailland">Chailland</option></select>
+      <select id="eSite"><option value="La Croixille">La Croixille</option></select>
     </div>
     <div class="form-row"><label>Email <span style="text-transform:none;font-weight:400">(pour les notifications de congés)</span></label><input type="email" id="eEmail" placeholder="prenom.nom@exemple.fr"/></div>
     <div class="toggle-row"><input type="checkbox" id="ePause"/><label for="ePause">Pause de 30 min obligatoire (décoché = coupure suivie en durée réelle)</label></div>
@@ -472,7 +472,7 @@
       <div class="form-row"><label>Prénom Nom</label><input type="text" id="nName" placeholder="Ex: Marie Dupont"/></div>
       <div class="form-row"><label>Code PIN (4 chiffres)</label><input type="password" id="nPin" maxlength="4" placeholder="••••"/></div>
       <div class="form-row"><label>Site</label>
-        <select id="nSite"><option value="Saint Ouen des Toits">Saint Ouen des Toits</option><option value="Chailland">Chailland</option></select>
+        <select id="nSite"><option value="La Croixille">La Croixille</option></select>
       </div>
       <div class="form-row"><label>Email <span style="text-transform:none;font-weight:400">(pour les notifications de congés)</span></label><input type="email" id="nEmail" placeholder="prenom.nom@exemple.fr"/></div>
       <div class="toggle-row"><input type="checkbox" id="nPause" checked/><label for="nPause">Pause de 30 min obligatoire (décoché = coupure suivie en durée réelle)</label></div>
@@ -543,11 +543,11 @@ firebase.auth().signInAnonymously().catch(err=>{
 const COLORS=['#002395','#1A7A4A','#C0710A','#6B21A8','#0369A1','#B91C1C','#0D5E5E','#7C4010'];
 
 const defaultEmployees = [
-  {id:1,name:'Sophie Martin',pin:'1234',site:'Saint Ouen des Toits',color:COLORS[0],pause:true},
-  {id:2,name:'Lucas Bernard',pin:'2345',site:'Saint Ouen des Toits',color:COLORS[1],pause:true},
-  {id:3,name:'Emma Leroy',pin:'3456',site:'Chailland',color:COLORS[2],pause:false},
-  {id:4,name:'Thomas Dubois',pin:'4567',site:'Chailland',color:COLORS[3],pause:true},
-  {id:5,name:'Chloé Moreau',pin:'5678',site:'Saint Ouen des Toits',color:COLORS[4],pause:false},
+  {id:1,name:'Sophie Martin',pin:'1234',site:'La Croixille',color:COLORS[0],pause:true},
+  {id:2,name:'Lucas Bernard',pin:'2345',site:'La Croixille',color:COLORS[1],pause:true},
+  {id:3,name:'Emma Leroy',pin:'3456',site:'La Croixille',color:COLORS[2],pause:false},
+  {id:4,name:'Thomas Dubois',pin:'4567',site:'La Croixille',color:COLORS[3],pause:true},
+  {id:5,name:'Chloé Moreau',pin:'5678',site:'La Croixille',color:COLORS[4],pause:false},
 ];
 
 let employees = [];
@@ -557,7 +557,7 @@ let settings  = {email:'gerant@lagourmandise.fr', heures:35, adminPin:'0000', se
 let conges    = [];   // {id, empId, type, start, end}
 let signatures = [];  // {id, empId, month:'YYYY-MM', signedAt, signature(dataURL), totalH}
 let congesMonthDate = new Date();
-let congesSiteFilter = 'all'; // 'all' | 'Saint Ouen des Toits' | 'Chailland'
+let congesSiteFilter = 'all'; // 'all' | nom du site (ex: 'La Croixille')
 
 let adminUnlocked = false;
 
@@ -582,11 +582,19 @@ function saveConges(){ congesRef.set(conges); }
 firebase.auth().onAuthStateChanged(user=>{
   if(!user) return; // pas encore connecté, on attend
 
-  // Si la base est vide (premier lancement), on la remplit avec des données de démo
-  employeesRef.once('value').then(snap=>{ if(!snap.exists()) employeesRef.set(defaultEmployees); });
-  pointagesRef.once('value').then(snap=>{ if(!snap.exists()) pointagesRef.set(genDemo()); });
-  settingsRef.once('value').then(snap=>{ if(!snap.exists()) settingsRef.set(settings); });
-  congesRef.once('value').then(snap=>{ if(!snap.exists()) congesRef.set([]); });
+  // On ne remplit avec les données de démo QUE lors du tout premier lancement de la base.
+  // Un indicateur dédié (meta/seeded) évite que la suppression manuelle des salariés
+  // de démo ne les fasse réapparaître au chargement suivant.
+  const metaRef = db.ref('meta/seeded');
+  metaRef.once('value').then(snap=>{
+    if(!snap.exists()){
+      employeesRef.set(defaultEmployees);
+      pointagesRef.set(genDemo());
+      settingsRef.set(settings);
+      congesRef.set([]);
+      metaRef.set(true);
+    }
+  });
 
   // Écoute en temps réel : dès qu'un appareil modifie une donnée, tous les autres se mettent à jour automatiquement
   employeesRef.on('value', snap=>{
