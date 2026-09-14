@@ -245,6 +245,7 @@
     <button class="tab" id="tabValidConges" style="display:none" onclick="showPage('valid-conges',this)">✅ Valider congés<span id="pendingBadge" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:.05rem .4rem;font-size:.65rem;margin-left:.3rem"></span></button>
     <button class="tab" id="tabAdmin" style="display:none" onclick="showPage('admin',this)">⚙️ Admin</button>
     <button class="tab" id="tabLock" onclick="requestAdminAccess()">🔒 Accès gérant</button>
+    <button class="tab" id="tabLogout" style="display:none;background:var(--red);color:#fff" onclick="lockAdmin()">🔓 Verrouiller</button>
   </div>
   <div class="nav-time" id="navTime">--:--</div>
 </nav>
@@ -717,12 +718,29 @@ function requestAdminAccess(){
     document.getElementById('tabValidConges').style.display='inline-block';
     document.getElementById('tabFeuilles').style.display='inline-block';
     document.getElementById('tabAdmin').style.display='inline-block';
-    document.getElementById('tabLock').textContent='🔓 Gérant connecté';
+    document.getElementById('tabLock').style.display='none';
+    document.getElementById('tabLogout').style.display='inline-block';
     toast('🔓 Accès gérant débloqué','t-success');
     showPage('dashboard', document.getElementById('tabDashboard'));
   } else {
     toast('❌ Code incorrect','t-error');
   }
+}
+
+// Reverrouille l'accès gérant : à utiliser avant de rendre l'appareil/tablette
+// à un salarié, pour éviter que ses actions (ex: demande de congé) soient
+// automatiquement traitées comme si elles venaient du gérant.
+function lockAdmin(){
+  adminUnlocked=false;
+  document.getElementById('tabDashboard').style.display='none';
+  document.getElementById('tabRecap').style.display='none';
+  document.getElementById('tabValidConges').style.display='none';
+  document.getElementById('tabFeuilles').style.display='none';
+  document.getElementById('tabAdmin').style.display='none';
+  document.getElementById('tabLock').style.display='inline-block';
+  document.getElementById('tabLogout').style.display='none';
+  toast('🔒 Accès gérant verrouillé','t-info');
+  showPage('pointer', document.querySelector(".tab[onclick*=\"'pointer'\"]"));
 }
 
 // ══════════════════════════════════════════
