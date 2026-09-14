@@ -504,9 +504,8 @@
 <script>
 // ⚠️ À REMPLACER : cette clé et les identifiants service/template plus bas
 // dans le fichier appartiennent au compte EmailJS d'origine (AxEl).
-// Créez votre propre compte EmailJS gratuit et remplacez Hx45flDjyjWz_haqo,
-// service_i0lfwfg et template_47ze0fo (recherchez ces 3 mots dans le fichier).
-emailjs.init({ publicKey: "Hx45flDjyjWz_haqo" });
+// Compte EmailJS de La Gourmandise (David Rivaux).
+emailjs.init({ publicKey: "sm_h_lzzmuVeohZ88" });
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -1119,7 +1118,7 @@ function notifyManagerNewConge(emp, conge){
   const message=`Bonjour,\n\n${emp.name} (${emp.site}) vient de déposer une demande de type "${conge.type}" ${periode}.\n\nRendez-vous dans l'onglet "✅ Valider congés" de la pointeuse pour l'approuver ou la refuser.`;
   const email=settings.email||'gerant@lagourmandise.fr';
 
-  emailjs.send('service_i0lfwfg','template_47ze0fo',{
+  emailjs.send('service_pzubtji','template_cnkfikv',{
     to_email: email,
     subject: subject,
     message: message
@@ -1147,7 +1146,7 @@ function notifyEmployeeConge(emp, conge, approuve){
     ? `Bonjour ${emp.name},\n\nVotre demande (${conge.type}) ${periode} a été validée par le gérant.${messageLine}\n\nBonnes vacances !`
     : `Bonjour ${emp.name},\n\nVotre demande (${conge.type}) ${periode} a été refusée par le gérant.${messageLine}\n\nN'hésite pas à te rapprocher de lui pour en discuter.`;
 
-  emailjs.send('service_i0lfwfg','template_47ze0fo',{
+  emailjs.send('service_pzubtji','template_cnkfikv',{
     to_email: emp.email,
     subject: subject,
     message: message
@@ -1352,7 +1351,7 @@ function notifyEmployeeCongeModified(emp, conge){
   const periode=conge.start===conge.end
     ? new Date(conge.start+'T12:00:00').toLocaleDateString('fr-FR')
     : `du ${new Date(conge.start+'T12:00:00').toLocaleDateString('fr-FR')} au ${new Date(conge.end+'T12:00:00').toLocaleDateString('fr-FR')}`;
-  emailjs.send('service_i0lfwfg','template_47ze0fo',{
+  emailjs.send('service_pzubtji','template_cnkfikv',{
     to_email: emp.email,
     subject: `✏️ Votre congé a été modifié`,
     message: `Bonjour ${emp.name},\n\nVotre congé a été modifié par le gérant.\n\nNouvelles informations : ${conge.type} ${periode}.\n\nN'hésite pas à te rapprocher de lui pour toute question.`
@@ -1824,7 +1823,7 @@ function sendEmail(){
 
   toast('📧 Envoi en cours...','t-info');
 
-  emailjs.send('service_i0lfwfg','template_47ze0fo',{
+  emailjs.send('service_pzubtji','template_cnkfikv',{
     to_email: email,
     subject: subject,
     message: body
@@ -2039,7 +2038,7 @@ function sendFeuilleEmailToManager(emp, month){
   body+=`La feuille signée (avec la signature du salarié) est archivée dans l'onglet "🖊 Feuilles signées" de la pointeuse, où vous pouvez la télécharger en PDF.`;
 
   const email=settings.email||'gerant@lagourmandise.fr';
-  emailjs.send('service_i0lfwfg','template_47ze0fo',{
+  emailjs.send('service_pzubtji','template_cnkfikv',{
     to_email: email,
     subject: `✍ Feuille d'heures signée — ${emp.name} — ${moisLabelOf(month)}`,
     message: body
@@ -2197,7 +2196,7 @@ function checkOvertimeAndAlert(entry){
   const message=`${emp.name} (${emp.site}) a réalisé ${entry.duree.toFixed(1)}h de travail le ${dateLbl}.\n\nArrivée : ${entry.arrivee}\nDépart : ${entry.depart}\nSeuil configuré : ${seuil}h/jour\n\nCeci constitue potentiellement des heures supplémentaires à vérifier.`;
   const email=settings.email||'gerant@lagourmandise.fr';
 
-  emailjs.send('service_i0lfwfg','template_47ze0fo',{
+  emailjs.send('service_pzubtji','template_cnkfikv',{
     to_email: email,
     subject: subject,
     message: message
